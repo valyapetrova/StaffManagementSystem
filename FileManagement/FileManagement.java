@@ -1,76 +1,54 @@
 package FileManagement;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import Client.Employee;
+import Client.Manager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+public class FileManagement extends Manager {
 
-public class FileManagement {
+    private static final File file_Path = new File("C:/Users/valya/OneDrive/StaffManagementSystem/src/main/java/employees.json");
 
-    private static final String file = "C:/Users/valya/OneDrive/SirmaAcademy/Sirma/src/com/StaffManagementSystem/src/main/java/employees.json";
-
-    // Reading JSON file
+    public FileManagement(){
+ }
     public JSONArray readFile() {
-        JSONArray employeeList = new JSONArray();
-        try (FileReader reader = new FileReader(file)) {
+        JSONArray jsonArray = new JSONArray();
+        try (FileReader reader = new FileReader(file_Path)) {
             Object obj = new JSONParser().parse(reader);
-            // Check if the parsed object is an instance of JSONArray
-            if (obj.getClass().equals(JSONArray.class)) {
-                employeeList = (JSONArray) obj;
-            } else {
-                System.out.println("Invalid JSON format in the file.");
-            }
+            jsonArray = (JSONArray) obj;
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
-
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        return employeeList;
+        return jsonArray;
     }
 
     // Writing to JSON
-    public void writeEmployeeListToFile(JSONArray employeeList) {
-        try (FileWriter file = new FileWriter("C:/Users/valya/OneDrive/SirmaAcademy/Sirma/src/com/StaffManagementSystem/src/main/java/employees.json")) {
-            file.write(employeeList.toJSONString());
+    public void writeEmployeeListToFile(List<Employee> employeeList) {
+        JSONArray employeeJsonArray = new JSONArray();
+        for(Employee employee : employeeList ) {
+            JSONObject employeeJson = new JSONObject();
+            employeeJson.put("Name",employee.getName());
+            employeeJson.put("StartDate", employee.getStartDate());
+            employeeJson.put("Department",employee.getDepartment());
+            employeeJson.put("Role", employee.getPosition());
+            employeeJson.put("Id", employee.getId());
+            employeeJson.put("Salary", employee.getSalary());
+            employeeJsonArray.add(employeeJson);
+        }
+        try (FileWriter file = new FileWriter("C:/Users/valya/OneDrive/StaffManagementSystem/src/main/java/employees.json")) {
+            file.write(employeeJsonArray.toJSONString());
             file.flush();
             System.out.println("Client.Employee list updated successfully.");
         } catch (IOException e) {
             System.out.println("Error with writing to the file");
         }
-    }
-
-    // Reading the employees from the file and printing their details
-    public JSONArray viewEmployees() {
-        JSONParser parser = new JSONParser();
-        JSONArray employeeList = new JSONArray();
-
-        try (FileReader reader = new FileReader(file)) {
-            Object obj = parser.parse(reader);
-                employeeList = (JSONArray) obj;
-                // Print the employee details (specification)
-                Iterator<JSONObject> iterator = employeeList.iterator();
-                while (iterator.hasNext()) {
-                    JSONObject employeeObject = iterator.next();
-                    System.out.println("ID: " + employeeObject.get("Id"));
-                    System.out.println("Name: " + employeeObject.get("Name"));
-                    System.out.println("Department: " + employeeObject.get("Department"));
-                    System.out.println("Position: " + employeeObject.get("Position"));
-                    System.out.println("Salary: " + employeeObject.get("Salary"));
-                    System.out.println("Start Date: " + employeeObject.get("dateOfStart"));
-                    System.out.println("--------------------------------------");
-            }
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-
-        return employeeList;
     }
 
 }

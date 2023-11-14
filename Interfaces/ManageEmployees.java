@@ -1,13 +1,11 @@
 package Interfaces;
 
 import Client.Employee;
-import org.json.simple.JSONObject;
 
 
 public interface ManageEmployees {
 
-    public void raiseSalary();
-    public void fireEmployee();
+    public void raiseSalary(Double salary,Employee em);
     public Employee addEmployee();
 
 }

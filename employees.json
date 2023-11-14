@@ -1,1 +1,1 @@
-[{"Salary":10000.0,"Department":"Education","Position":"Lecturer","dateOfStart":"2023-09-04","Id":6,"Name":"Alen Paunov"},{"Salary":5000.0,"Department":"IT","Position":"Junior Java Developer","dateOfStart":"2023-09-08","Id":4,"Name":"Valya"}]
+[{"StartDate":"2020-04-04","Role":" Junior Java Developer","Salary":1400.5,"Department":" IT","Id":1,"Name":"Peter Peterson"},{"StartDate":"2022-10-10","Role":" Junior Front-End Developer","Salary":1400.0,"Department":"IT","Id":2,"Name":"Ivan Ivanson"}]

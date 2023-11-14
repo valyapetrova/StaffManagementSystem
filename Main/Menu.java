@@ -1,82 +1,60 @@
 package Main;
-
 import Client.Employee;
+import Client.Manager;
 import FileManagement.FileManagement;
+import org.json.simple.JSONObject;
 
-import java.util.List;
-import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class Menu {
-    public static void start(){
-        Employee em = new Employee();
-        FileManagement fm = new FileManagement();
+    public static void start() {
         Scanner sc = new Scanner(System.in);
-        boolean isRunning = true;
-        while(isRunning){
-            System.out.println("Welcome to Staff Management System");
-            commands();
-            String command = sc.nextLine();
-            switch(command){
-                case "1":
-                    // Add employee;
-                    em.addEmployee(); //creating employee
-                    System.out.println("Would you like to add more employees? [Y/N]");
-                    String input = sc.nextLine();
-                    if (input.equalsIgnoreCase("Y")) {
-                        em.addEmployee();
-                        System.out.println("View employees?[Y][N]");
-                        String answer = sc.nextLine();
-                        if (answer.equalsIgnoreCase("Y")) {
-                            fm.viewEmployees();
-                            System.out.println("returning to the menu..");
-                        }else{
-                            System.out.println("Returning to the menu..");
-                            start();
-                        }
-                    }else {
-                        backToMenu(true);
-                        return;
-                    }
-                case "2":
-                    // Edit Employee
-                    em.raiseSalary();
-                    backToMenu(true);
-                    return;
-                case "3":
-                    // List Employees
-                    fm.viewEmployees();
-                    backToMenu(true);
-                    return;
+        FileManagement fm = new FileManagement();
+        Employee em = new Employee();
 
-                case "4":
-                    // Fire Employee
-                    em.fireEmployee();
-                    backToMenu(true);
-                    return;
-                case "5":
-                    // Exit menu
+        System.out.println("Welcome to Staff Management System");
+        displayCommands();
+
+        List<Employee> savedEmployees = new ArrayList<>();
+        for (Object ob : fm.readFile()) {
+            JSONObject emp = (JSONObject) ob;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+            try {
+                savedEmployees.add(new Employee(Math.toIntExact((Long) emp.get("Id")), (String) emp.get("Name"),
+                        formatter.parse((String) emp.get("StartDate")), (String) emp.get("Department"),
+                        (String) emp.get("Role"), (Double) emp.get("Salary")));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Manager manager = new Manager(savedEmployees); // Adding the info from the file in manager, so my program could start
+                                                      //with the saved info
+        boolean isRunning = true;
+
+        while (isRunning) {
+            try {
+                String[] command = sc.nextLine().trim().split(" ");
+                if(command[0].equals("exit")){
+                    //Saving the data
+                    fm.writeEmployeeListToFile(manager.employees);
                     isRunning = false;
-                    break;
+                }
+                else {
+                    manager.execute(command);
+                }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
         }
     }
-    public static void commands(){
-        System.out.println("1.Add Employee");
-        System.out.println("2.Edit Employee");
-        System.out.println("3.List Employees");
-        System.out.println("4.Fire Employee");
-        System.out.println("5.Exit menu");
-    }
-    public static void backToMenu(boolean isRunning){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Return to the main menu?[Y][N]");
-        String answer = sc.nextLine();
-        if (answer.equalsIgnoreCase("N")) {
-            isRunning = false;
-        }else{
-            start();
+        public static void displayCommands() {
+            System.out.println("add Employee");
+            System.out.println("edit <id>");
+            System.out.println("search <param> <id>");
+            System.out.println("fire <id>");
+            System.out.println("exit");
         }
-
-    }
 }
